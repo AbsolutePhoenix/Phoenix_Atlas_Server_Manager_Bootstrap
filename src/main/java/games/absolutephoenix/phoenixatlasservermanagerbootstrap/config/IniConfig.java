@@ -40,6 +40,7 @@ public class IniConfig {
         ini.add("General", "ProjectName", BootstrapSettings.ProjectName);
         ini.add("General", "LogoPath", BootstrapSettings.LogoPath);
         ini.add("General", "BypassAndUpdate", BootstrapSettings.BypassAndUpdate);
+        ini.add("GitHub", "AccessToken", BootstrapSettings.AccessToken);
         ini.add("Executable", "ExecutableName", BootstrapSettings.ExecutableName);
         ini.add("Executable", "CMDLaunchArguments", BootstrapSettings.CMDLaunchArguments);
         ini.add("Executable", "ProgramLaunchArguments", BootstrapSettings.ProgramLaunchArguments);
@@ -66,9 +67,9 @@ public class IniConfig {
         BootstrapSettings.ProjectName = ini.get("General", "ProjectName");
         BootstrapSettings.LogoPath = ini.get("General", "LogoPath");
         BootstrapSettings.BypassAndUpdate = ini.get("General", "BypassAndUpdate", boolean.class);
+        BootstrapSettings.AccessToken = ini.get("GitHub", "AccessToken");
         BootstrapSettings.ExecutableName = ini.get("Executable", "ExecutableName");
         BootstrapSettings.CMDLaunchArguments = ini.get("Executable", "CMDLaunchArguments");
         BootstrapSettings.ProgramLaunchArguments = ini.get("Executable", "ProgramLaunchArguments");
-
     }
 }

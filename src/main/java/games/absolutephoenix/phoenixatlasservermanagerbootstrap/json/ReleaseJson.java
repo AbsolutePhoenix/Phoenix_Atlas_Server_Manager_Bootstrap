@@ -17,9 +17,6 @@ import games.absolutephoenix.phoenixatlasservermanagerbootstrap.utils.GithubAPI;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.swing.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,8 +126,12 @@ public class ReleaseJson {
         release.published_at = latestJson.getString("published_at");
         release.tarball_url = latestJson.getString("tarball_url");
         release.zipball_url = latestJson.getString("zipball_url");
-        release.body = latestJson.getString("body");
-
+        try {
+            release.body = latestJson.getString("body");
+        }catch (JSONException e)
+        {
+            release.body = "";
+        }
         JSONObject authorJson = latestJson.getJSONObject("author");
         release.author.login = authorJson.getString("login");
         release.author.id = authorJson.getInt("id");
@@ -193,7 +194,7 @@ public class ReleaseJson {
             try {
                 release.assets.label.add(assetsJson.getString("label"));
             }catch (JSONException e){
-                release.assets.label = null;
+                release.assets.label.add("");
             }
             release.assets.content_type.add(assetsJson.getString("content_type"));
             release.assets.state.add(assetsJson.getString("state"));
@@ -226,10 +227,10 @@ public class ReleaseJson {
         }
 
     }
-    public static List<ReleaseJson> ReleasesList(String releasesURL)
+    public static List<ReleaseJson> ReleasesList()
     {
         List<ReleaseJson> releases = new ArrayList<>();
-        JSONArray releaseArray = new JSONArray(GithubAPI.getLatest(releasesURL));
+        JSONArray releaseArray = new JSONArray(GithubAPI.getLatest());
         for (int x = 0; x < releaseArray.length(); x++)
             releases.add(new ReleaseJson(releaseArray.getJSONObject(x)));
 

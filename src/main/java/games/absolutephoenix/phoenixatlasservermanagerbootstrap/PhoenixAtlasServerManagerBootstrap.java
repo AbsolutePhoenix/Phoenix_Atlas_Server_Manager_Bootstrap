@@ -18,37 +18,84 @@ import games.absolutephoenix.phoenixatlasservermanagerbootstrap.config.IniConfig
 import games.absolutephoenix.phoenixatlasservermanagerbootstrap.json.ReleaseJson;
 import games.absolutephoenix.phoenixatlasservermanagerbootstrap.reference.BootstrapSettings;
 import games.absolutephoenix.phoenixatlasservermanagerbootstrap.userinterface.MainFrame;
+import games.absolutephoenix.phoenixatlasservermanagerbootstrap.utils.GithubAPI;
+import games.absolutephoenix.phoenixatlasservermanagerbootstrap.utils.VersionCheck;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicLookAndFeel;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 public class PhoenixAtlasServerManagerBootstrap {
     public static List<ReleaseJson> releases;
 
     public static void main(String[] args) {
+
         try {
             IniConfig.LoadConfig();
-        } catch (IOException e) {
+            if(BootstrapSettings.DarkMode) {
+                BasicLookAndFeel darcula = new DarculaLaf();
+                UIManager.setLookAndFeel(darcula);
+            }
+
+            if(!GithubAPI.checkCredentials()) {
+                GithubAPI.authenticate();
+            }
+            releases = ReleaseJson.ReleasesList();
+            if (BootstrapSettings.BypassAndUpdate)
+            {
+                if(VersionCheck.update(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.id)) {{
+                    for (int x = 0; x < PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.browser_download_url.size(); x++) {
+                        try {
+                            if(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.name.get(x).endsWith(".jar"))
+                                FileUtils.copyURLToFile(
+                                        new URL(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.browser_download_url.get(x)),
+                                        new File("bin/program/program.jar")
+                                );
+                            else if(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.name.get(x).endsWith(".exe"))
+                                FileUtils.copyURLToFile(
+                                        new URL(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.browser_download_url.get(x)),
+                                        new File("bin/program/program.exe")
+                                );
+                            else
+                                FileUtils.copyURLToFile(
+                                        new URL(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.browser_download_url.get(x)),
+                                        new File(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.assets.name.get(x))
+                                );
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+                    try {
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("ManagerVersion.txt", false));
+                        bufferedWriter.write(PhoenixAtlasServerManagerBootstrap.releases.get(0).release.id + "");
+                        bufferedWriter.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                try {
+                    Process process = Runtime.getRuntime().exec("cmd.exe /c start /wait " + BootstrapSettings.CMDLaunchArguments + " " + BootstrapSettings.ExecutableName + " " + BootstrapSettings.ProgramLaunchArguments);
+                    process.waitFor();
+                } catch (IOException | InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }else
+            {
+                new MainFrame();
+            }
+
+        } catch (IOException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
-        releases = ReleaseJson.ReleasesList("https://api.github.com/repos/" + BootstrapSettings.ProjectAuthor + "/" + BootstrapSettings.ProjectName + "/releases");
-        for(int x= 0; x < releases.size(); x++)
-            System.out.println(releases.get(x).release.name);
 
-        if(BootstrapSettings.DarkMode)
-        {
-            BasicLookAndFeel darcula = new DarculaLaf();
-            try {
-                UIManager.setLookAndFeel(darcula);
-            } catch (UnsupportedLookAndFeelException e) {
-                e.printStackTrace();
-            }
-        }
-
-        MainFrame mainFrame = new MainFrame();
 
     }
 

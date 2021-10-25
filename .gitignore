@@ -1,0 +1,16 @@
+# Project exclude paths
+/.gradle/
+/build/
+/build/classes/java/main/
+/gradlew
+/gradlew.bat
+/PackageInfo.bin
+/steamclient.dll
+/steamclient64.dll
+/tier0_s.dll
+/tier0_s64.dll
+/vstdlib_s.dll
+/vstdlib_s64.dll
+/WorkingDir/
+/.idea/
+/gradle/
